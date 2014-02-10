@@ -80,11 +80,7 @@ by Aleksandr Nikitin (a.nikitin@i.ua)
 					$.each(arr, function(key, value){
 						urlParameters = urlParameters + '&' + key + '=' + value;
 					});
-					if (urlParameters) {
-						history.pushState(null, null, '?' + urlParameters.substr(1));
-					} else {
-						history.pushState(null, null, urlParameters.substr(1));
-					}
+					history.pushState(null, null, '?' + urlParameters.substr(1));
 				}
 			},
 			removeKeyFromObject: function (object, keys) {
