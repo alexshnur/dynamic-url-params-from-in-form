@@ -82,6 +82,8 @@ by Aleksandr Nikitin (a.nikitin@i.ua)
 					});
 					if (urlParameters) {
 						history.pushState(null, null, '?' + urlParameters.substr(1));
+					} else {
+						history.pushState(null, null, '');
 					}
 				}
 			},
