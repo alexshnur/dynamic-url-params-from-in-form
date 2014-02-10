@@ -46,7 +46,7 @@ by Aleksandr Nikitin (a.nikitin@i.ua)
 					getParam = {};
 					_this.readUrlParam();
 					$.each(getParam, function(key, value){
-						$form.find('[data-name="' + key + '"]').val(value);
+						$form.find('[data-name="' + key + '"]').val(decodeURIComponent(value));
 					});
 				}
 			},
