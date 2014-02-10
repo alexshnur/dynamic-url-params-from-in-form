@@ -72,7 +72,9 @@ by Aleksandr Nikitin (a.nikitin@i.ua)
 						$form.find('[data-verify="true"]').each(function(){
 							var key = $(this).data('name');
 							var tempParam = getParam[key] === undefined ? '' : getParam[key];
+							var value;
 							console.log(tempParam + '!==' + $(this).val());
+							if (this.type === 'checkbox')
 							tempParam !== $(this).val() ? $(this).closest(selectors.formGroup).addClass(classNames.hasWarning) : $(this).closest(selectors.formGroup).removeClass(classNames.hasWarning);
 						});
 						if ($form.find(selectors.hasWarning).length > 0) {
