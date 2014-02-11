@@ -71,23 +71,29 @@ by Aleksandr Nikitin (a.nikitin@i.ua)
 					if (urlQueryString !== '') {
 						_this.readUrlParam();
 						$form.find('[data-verify="true"]').each(function(){
-							var key = $(this).data('name');
-							var tempParam = getParam[key] === undefined ? '' : decodeURIComponent(getParam[key]);
-							var condition;
-							console.log(tempParam + '!==' + $(this).val());
-							if (this.type !== 'select-multiple') {
-								condition = (tempParam !== $(this).val());
+							var key = $(this).data('name'),
+								condition, valTemp,
+								tempParam = getParam[key] === undefined ? '' : decodeURIComponent(getParam[key]);
+							if (this.type === 'select-multiple') {
+								valTemp = encodeURIComponent($(this).val()) === 'null' ? '' : encodeURIComponent($(this).val());
+								condition = (encodeURIComponent(tempParam) !== valTemp);
+							} else if (this.type === 'checkbox' && this.value === '') {
+								valTemp = this.checked === true ? 'true' : '';
+								condition = (tempParam !== valTemp);
 							} else {
-								condition = (encodeURIComponent(tempParam) !== encodeURIComponent($(this).val()));
+								condition = (tempParam !== $(this).val());
 							}
 							condition ? $(this).closest(selectors.formGroup).addClass(classNames.hasWarning) : $(this).closest(selectors.formGroup).removeClass(classNames.hasWarning);
-							console.log(this.type);
 						});
 						if ($form.find(selectors.hasWarning).length > 0) {
 							$(selectors.textWarning).removeClass(classNames.displayNone);
 						} else {
 							$(selectors.textWarning).addClass(classNames.displayNone);
 						}
+					} else {
+						$form.find('[data-verify="true"]').each(function(){
+							$(this).closest(selectors.formGroup).removeClass(classNames.hasWarning);
+						});
 					}
 				}
 			},
@@ -157,7 +163,7 @@ by Aleksandr Nikitin (a.nikitin@i.ua)
 					$.each(arr, function(key, value){
 						urlParameters = urlParameters + '&' + key + '=' + value;
 					});
-					history.pushState(null, null, '?' + urlParameters.substr(1));
+					history.pushState(null, null, urlParameters === '' ? location.pathname : '?' + urlParameters.substr(1));
 				}
 			},
 			removeKeyFromObject: function (object, keys) {
