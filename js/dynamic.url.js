@@ -49,6 +49,7 @@ by Aleksandr Nikitin (a.nikitin@i.ua)
 			_this.openPage();
 			$button.on('click', function(){
 				_this.readFormControl();
+				_this.hasWarningFunc();
 			});
 			$form.find('[data-verify="true"]').on('change', _this.hasWarningFunc);
 			$form.find('[data-verify="true"]').on('input propertychange', _this.hasWarningFunc);
@@ -71,11 +72,16 @@ by Aleksandr Nikitin (a.nikitin@i.ua)
 						_this.readUrlParam();
 						$form.find('[data-verify="true"]').each(function(){
 							var key = $(this).data('name');
-							var tempParam = getParam[key] === undefined ? '' : getParam[key];
-							var value;
+							var tempParam = getParam[key] === undefined ? '' : decodeURIComponent(getParam[key]);
+							var condition;
 							console.log(tempParam + '!==' + $(this).val());
-							if (this.type === 'checkbox')
-							tempParam !== $(this).val() ? $(this).closest(selectors.formGroup).addClass(classNames.hasWarning) : $(this).closest(selectors.formGroup).removeClass(classNames.hasWarning);
+							if (this.type !== 'select-multiple') {
+								condition = (tempParam !== $(this).val());
+							} else {
+								condition = (encodeURIComponent(tempParam) !== encodeURIComponent($(this).val()));
+							}
+							condition ? $(this).closest(selectors.formGroup).addClass(classNames.hasWarning) : $(this).closest(selectors.formGroup).removeClass(classNames.hasWarning);
+							console.log(this.type);
 						});
 						if ($form.find(selectors.hasWarning).length > 0) {
 							$(selectors.textWarning).removeClass(classNames.displayNone);
@@ -104,11 +110,11 @@ by Aleksandr Nikitin (a.nikitin@i.ua)
 
 					$.each(getParam, function(key, value){
 						var elem = $form.find('[data-name="' + key + '"]');
-						if (elem[0].tagName.toLowerCase() === 'select' && elem[0].multiple) {
+						if (elem[0].type === 'select-multiple') {
 							var getMultiple = value.split(',');
 							for (var i = 0; i < elem[0].options.length; i++){
 								$.each(getMultiple, function(key, value){
-									if (elem[0].options[i].value === getMultiple[key]) {
+									if (elem[0].options[i].value === decodeURIComponent(getMultiple[key])) {
 										elem[0].options[i].selected = true;
 									}
 								});
