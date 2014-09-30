@@ -1,33 +1,101 @@
 /*global $:false, jQuery:false*/
 /*
-Dynamic URL params from/in form v.0.1
+Dynamic URL params from/in form v.0.0.1
 by Aleksandr Nikitin (a.nikitin@i.ua)
  https://github.com/alexshnur/dynamic-url-params-from-in-form
 */
 (function($, window){
 	var readUrlForm, _this, getParam = {};
+	var selectors;
+	var classNames = {};
+
+	var buildSelectors = function(selectors, source, characterToPrependWith) {
+		$.each(source, function(propertyName, value){
+			selectors[propertyName] = characterToPrependWith + value;
+		});
+	};
+
+	var buildClassSelectors = function(classNames) {
+		var selectors = {};
+		if(classNames) {
+			buildSelectors(selectors, classNames, ".");
+		}
+		return selectors;
+	};
 
 	function supportsHistoryApi() {
 		return !!(window.history && history.pushState);
 	}
 
 	readUrlForm = (function(){
-		var $form, $formControl, $button;
+		var $form, $formGroup, $button;
 		function initializationForm (form, options){
 			_this = this;
 			_this.options = $.extend({}, _this.options, options);
+
+			classNames = {
+				displayNone: _this.options.displayNone,
+				textWarning: _this.options.textWarning,
+				formGroup: _this.options.formGroup,
+				hasWarning: _this.options.hasWarning,
+				buttonSubmit: _this.options.buttonSubmit
+			};
+
+			selectors = buildClassSelectors(classNames);
+
 			$form = form;
-			$formControl = $(_this.options.formControl);
-			$button = $(_this.options.buttonSubmit)
+			$formGroup = $(selectors.formGroup);
+			$button = $(selectors.buttonSubmit);
 			_this.openPage();
-			$button.on('click', _this.readFormControl);
+			$button.on('click', function(){
+				_this.readFormControl();
+				_this.hasWarningFunc();
+			});
+			$form.find('[data-verify="true"]').on('change', _this.hasWarningFunc);
+			$form.find('[data-verify="true"]').on('input propertychange', _this.hasWarningFunc);
 		}
 
 		initializationForm.prototype = {
 			options: {
 				removeKeyInUrl: ['offset', 'limit', 't', 'heightScrollPosition', 'idAfterRows'],
-				formControl: '.form-control',
-				buttonSubmit: '.btn'
+				formGroup: 'form-group',
+				hasWarning: 'has-warning',
+				textWarning: 'text-warning',
+				displayNone: 'display-none',
+				isHasWarning: true,
+				buttonSubmit: 'btn'
+			},
+			hasWarningFunc: function(elem){
+				if (_this.options.isHasWarning) {
+					var urlQueryString = location.search;
+					if (urlQueryString !== '') {
+						_this.readUrlParam();
+						$form.find('[data-verify="true"]').each(function(){
+							var key = $(this).data('name'),
+								condition, valTemp,
+								tempParam = getParam[key] === undefined ? '' : decodeURIComponent(getParam[key]);
+							if (this.type === 'select-multiple') {
+								valTemp = encodeURIComponent($(this).val()) === 'null' ? '' : encodeURIComponent($(this).val());
+								condition = (encodeURIComponent(tempParam) !== valTemp);
+							} else if (this.type === 'checkbox' && this.value === '') {
+								valTemp = this.checked === true ? 'true' : '';
+								condition = (tempParam !== valTemp);
+							} else {
+								condition = (tempParam !== $(this).val());
+							}
+							condition ? $(this).closest(selectors.formGroup).addClass(classNames.hasWarning) : $(this).closest(selectors.formGroup).removeClass(classNames.hasWarning);
+						});
+						if ($form.find(selectors.hasWarning).length > 0) {
+							$(selectors.textWarning).removeClass(classNames.displayNone);
+						} else {
+							$(selectors.textWarning).addClass(classNames.displayNone);
+						}
+					} else {
+						$form.find('[data-verify="true"]').each(function(){
+							$(this).closest(selectors.formGroup).removeClass(classNames.hasWarning);
+						});
+					}
+				}
 			},
 			openPage: function(){
 				_this.readUrl();
@@ -45,8 +113,23 @@ by Aleksandr Nikitin (a.nikitin@i.ua)
 				if (urlQueryString !== '') {
 					getParam = {};
 					_this.readUrlParam();
+
 					$.each(getParam, function(key, value){
-						$form.find('[data-name="' + key + '"]').val(value);
+						var elem = $form.find('[data-name="' + key + '"]');
+						if (elem[0].type === 'select-multiple') {
+							var getMultiple = value.split(',');
+							for (var i = 0; i < elem[0].options.length; i++){
+								$.each(getMultiple, function(key, value){
+									if (elem[0].options[i].value === decodeURIComponent(getMultiple[key])) {
+										elem[0].options[i].selected = true;
+									}
+								});
+							}
+						} else if (elem[0].type === 'checkbox' && value === 'true') {
+							elem[0].checked = value;
+						} else {
+							elem.val(decodeURIComponent(value));
+						}
 					});
 				}
 			},
@@ -64,10 +147,10 @@ by Aleksandr Nikitin (a.nikitin@i.ua)
 			},
 			readFormControl: function(){
 				var data = {};
-				$formControl.each(function(){
+				$form.find('[data-name]').each(function(){
 					var key = $(this).data('name');
-					if (($(this).val() !== 'manual_input') || $(this).val()) {
-						data[key] = $(this).val();
+					if (($(this).val() !== 'manual_input') || $(this).val() || (this.checked && !this.value)) {
+						data[key] = (this.checked && !this.value) ? this.checked : $(this).val();
 					}
 				});
 				_this.removeEmptyProperties(data);
@@ -80,9 +163,7 @@ by Aleksandr Nikitin (a.nikitin@i.ua)
 					$.each(arr, function(key, value){
 						urlParameters = urlParameters + '&' + key + '=' + value;
 					});
-					if (urlParameters) {
-						history.pushState(null, null, '?' + urlParameters.substr(1));
-					}
+					history.pushState(null, null, urlParameters === '' ? location.pathname : '?' + urlParameters.substr(1));
 				}
 			},
 			removeKeyFromObject: function (object, keys) {

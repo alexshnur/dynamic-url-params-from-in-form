@@ -3,7 +3,7 @@
 <head>
 	<meta name="Description" content="Dynamic URL params from/in form, verify form with URL, compared with url, bootstrap style, javascript, jquery" />
 	<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
-	<title>Dynamic URL params from/in form v.0.1</title>
+	<title>Dynamic URL params from/in form v.0.0.1</title>
 	<meta name="Keywords" content="Dynamic, URL params, from/in, form, verify, bootstrap, style, javascript, jquery, compared with url">
 	<meta name="Robots" content="all">
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -33,7 +33,14 @@
 							<ul class="dropdown-menu">
 								<li><a href="http://alexshnur.github.io/drag-n-drop-table-columns/">Drag & Drop Table Columns</a></li>
 								<li><a href="http://alexshnur.github.io/dynamic-url-params-from-in-form/">Dynamic URL params from/in form</a></li>
+								<li><a href="http://alexshnur.github.io/json-in-color/">JSON in color</a></li>
 								<li><a href="#">Resizable table columns</a></li>
+							</ul>
+						</li>
+						<li class="dropdown">
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown">More modules<b class="caret"></b></a>
+							<ul class="dropdown-menu">
+								<li><a href="http://alexshnur.github.io/remove-html-attributes/">Remove HTML attributes</a></li>
 							</ul>
 						</li>
 					</ul>
@@ -45,18 +52,46 @@
 			<a href="https://github.com/alexshnur/dynamic-url-params-from-in-form/tarball/master" class="btn btn-primary"><span>Download .tar.gz</span></a>
 			<a href="https://github.com/alexshnur/dynamic-url-params-from-in-form/" class="btn btn-warning pull-right"><span>View on GitHub</span></a>
 		</section>
-		<h1>Dynamic URL params from/in form v.0.1</h1>
-		<blockquote><p class="text-warning">Work in IE9+, Google Chrome, Mozzila Firefox</p></blockquote>
+		<h1>Dynamic URL params from/in form v.0.0.1</h1>
+		<blockquote><p class="text-warning">Work in IE10+, Google Chrome, Mozzila Firefox</p></blockquote>
+		<blockquote><p class="text-danger">For work in IE8 and IE9 place use <a href="https://github.com/browserstate/history.js" target="_blank">history.js</a></p></blockquote>
 		<form role="form" class="form">
 			<div class="form-group">
-				<label for="exampleInputEmail1">Email address</label>
-				<input type="email" class="form-control" id="exampleInputEmail1" data-name="email" placeholder="Enter email">
+				<label for="exampleInputText">Text input</label>
+				<input type="text" class="form-control" id="exampleInputText" data-name="text" data-verify="true" placeholder="Text input">
 			</div>
 			<div class="form-group">
-				<label for="exampleInputPassword1">Password</label>
-				<input type="text" class="form-control" id="exampleInputPassword1" data-name="password" placeholder="Password">
+				<label for="exampleSelect">Select</label>
+				<select id="exampleSelect" class="form-control" data-name="select" data-verify="true">
+					<option value="">Empty</option>
+					<option value="1">1</option>
+					<option value="2">2</option>
+					<option value="3">3</option>
+					<option value="4">4</option>
+					<option value="5">5</option>
+				</select>
 			</div>
-			<button type="submit" class="btn btn-default">Submit</button>
+			<div class="form-group">
+				<label for="exampleSelectMultiple">Select multiple</label>
+				<select multiple id="exampleSelectMultiple" class="form-control" data-name="selectMultiple" size="6" data-verify="true">
+					<option value="">0</option>
+					<option value="1">1</option>
+					<option value="2">2</option>
+					<option value="3">3</option>
+					<option value="4">4</option>
+					<option value="5">5</option>
+				</select>
+			</div>
+			<div class="form-group">
+				<label>Checkbox</label>
+				<div class="checkbox">
+					<label>
+						<input type="checkbox" value="" data-name="checkbox" data-verify="true" />
+						Option one is this and that&mdash;be sure to include why it's great
+					</label>
+				</div>
+			</div>
+			<button type="button" class="btn btn-default">Submit</button>
 		</form>
 		<br />
 		<p>
@@ -67,6 +102,9 @@
 	<script src="js/bootstrap.min.js" type="text/javascript"></script>
 	<script src="js/dynamic.url.js" type="text/javascript"></script>
 	<script>
+		var clickAlert = function(){
+			alert('click button');
+		};
 		$('.form').readUrlForm();
 	</script>
 </body>
