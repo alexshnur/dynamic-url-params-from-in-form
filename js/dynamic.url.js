@@ -30,6 +30,7 @@ by Aleksandr Nikitin (a.nikitin@i.ua)
 	readUrlForm = (function(){
 		var $form, $formGroup, $button;
 		function initializationForm (form, options){
+			var onType;
 			_this = this;
 			_this.options = $.extend({}, _this.options, options);
 
@@ -47,7 +48,12 @@ by Aleksandr Nikitin (a.nikitin@i.ua)
 			$formGroup = $(selectors.formGroup);
 			$button = $(selectors.buttonSubmit);
 			_this.openPage();
-			$button.on('click', function(){
+			if ($button[0].tagName.toLowerCase() === 'select') {
+				onType = 'change';
+			} else {
+				onType = 'click';
+			}
+			$button.on(onType, function(){
 				_this.readFormControl();
 				_this.hasWarningFunc();
 			});
@@ -63,7 +69,8 @@ by Aleksandr Nikitin (a.nikitin@i.ua)
 				textWarning: 'text-warning',
 				displayNone: 'display-none',
 				isHasWarning: true,
-				buttonSubmit: 'btn'
+				buttonSubmit: 'btn',
+				loadFunction: undefined
 			},
 			hasWarningFunc: function(elem){
 				if (_this.options.isHasWarning) {
@@ -131,6 +138,9 @@ by Aleksandr Nikitin (a.nikitin@i.ua)
 							elem.val(decodeURIComponent(value));
 						}
 					});
+				}
+				if (_this.options.loadFunction) {
+					_this.options.loadFunction();
 				}
 			},
 			readUrlParam: function(){
